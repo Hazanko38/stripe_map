@@ -48,3 +48,6 @@ would, where the key is the index associated with the max depth of the stripe_ma
 associated with a value/location held within the object for use in collision detection to find local objects to check. There may be some other unique use for it,
 although I currently have none for myself. I originally attempted this to see if this was a better and easier option to use than what I am using in my GridMap,
 but I think this performed roughly 4 times worse for my given situation.
+
+EXAMPLE:
+	main.cpp contains usage example and benchmark test.
