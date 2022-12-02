@@ -1,0 +1,50 @@
+Templated container class designed to optimze performance for collision testing. Attempt at mixing benefits of std::vector + std::map.
+(my GridMap implem turns out to be much, much better for this)
+
+PURPOSE:
+	The idea is to have a container that manage ''striping'' objects added to it based on a given index.
+The stripe_map can be given a max depth, a stripe amount, as well as the init width of each stripe(amount of items per stripe before needing to expand). 
+If max depth is set to 100, and the stripe amount to 10, items added with an index of 0-9 will be placed in stripe one, any items index 10-19 added to 
+stripe 2, and so on... If the amount of items added to a stripe exceed the total width of the stripe, then memory is reallocated to allow space within that 
+stripe once more. The goal is to have these items arranged contiguously within memory arranged by index, in order to allow quicker access and traversal
+based on a given starting index(stripe depth). 
+
+Naturally, there will be gaps between each stripe unless keeping the stripe width exactly the same each the amount of items per stipe(stripe width of 4,
+with a single added item leaves a gap of 3 to next stripe), although can be fixed with shrink() which removes all gaps and re-adjusts stripes to new values.
+In situations where items are added or removed too often, the gains pretty much go away as the expectation(though not requirement) is the container is
+shrunk() before attempting to access it. A fully implemented random-access iterator is provided as well, that works both with or without calling shrink()
+first.
+
+BENCHMARK:
+	1K elements per test - 5 tests each for average
+	( random values are loaded by random index within depth range )
+	( loop test checks each added item against that item's index -1 and +1(before, current, after stripe) and sums each value )
+	times are in microseconds
+
+	stripe_map LOAD: 103,065
+	stripe_map LOOP (before shrink) : 20,814
+	stripe_map LOOP (after shrink)   : 1,609
+
+	std::map LOAD: 165509
+	std::map LOOP: 12,139
+
+	std::unordered_map LOAD: 156,453
+	std::unordered_map LOOP: 3,872
+
+	std::vector LOAD: 29,703
+	std::vector LOOP: 483
+
+USAGE:
+	stripe_map constructor takes three arguments: stripe_depth, stripe_amount, and stripe_width.
+
+	stripe_depth : MAX value intended to be added to stripe_map - all other values exceeding are placed in last stripe.
+	stripe_amount : AMOUNT of stripes to be formed from the MAX value - this should be a nice clean integer value to allow proper striping(ex: 100/10).
+	stripe_width : amount of items allowed per stripe on init before needing to reallocate for more space - this attempts to roughly double in width
+		after first widening for each stripe that needs it.
+
+	I'm being annoying and using what's essentially custom implem for std::pair in order to be consistent within the rest of my codebase, but 
+there's no reason this couldn't be swapped out for std::pair relatively easily(probably with just find & replace). This does accept a pair just as std::map/uo_m
+would, where the key is the index associated with the max depth of the stripe_map. The object/value itself can be anything, but the idea is that the index is
+associated with a value/location held within the object for use in collision detection to find local objects to check. There may be some other unique use for it,
+although I currently have none for myself. I originally attempted this to see if this was a better and easier option to use than what I am using in my GridMap,
+but I think this performed roughly 4 times worse for my given situation.

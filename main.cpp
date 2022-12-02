@@ -22,8 +22,17 @@ const int rectSize = 350;
 
 uti_RandomGenerator uti_RandomGenerator::instance;
 
-std::vector<SDL_Rect> stripeLoadList;
-qmap::stripe_map<SDL_Rect*> stripeMap(mapWidth, 1000);
+struct Rect
+{
+    int x = 0;
+    int y = 0;
+    int w = 0;
+    int h = 0;
+
+};
+
+std::vector<Rect> stripeLoadList;
+qmap::stripe_map<Rect*> stripeMap(mapWidth, 1000);
 
 ///-------------------------------------------------------------------------------------------------------
 ///STRIPE_MAP TEST
@@ -39,7 +48,7 @@ namespace CheckStripeMap
 
         for ( uint64_t i = 0; i < totalAmount; i++ )
         {
-            SDL_Rect tLoc;
+            Rect tLoc;
             tLoc.x = uti_RandomGenerator::Instance().GenerateRandom() * mapWidth_s;
             tLoc.y = uti_RandomGenerator::Instance().GenerateRandom() * mapHeight_s;
             tLoc.w = rectSize;
@@ -77,7 +86,7 @@ namespace CheckStripeMap
             stripeMap.reset();
 
             for ( auto & item : stripeLoadList )
-                stripeMap.add(Prs::tpsPr<size_t, SDL_Rect*>(item.x, &item));
+                stripeMap.add(Prs::tpsPr<size_t, Rect*>(item.x, &item));
 
             stripeMap.shrink();
 
