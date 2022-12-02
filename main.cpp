@@ -2,8 +2,6 @@
 #include <chrono>
 #include <assert.h>
 
-#include <SDL2/SDL.h>
-
 #include <stripe_map.hpp>
 #include <_Utilities/uti_RandomGenerator.h>
 #include <_Utilities/uti_FindInside.hpp>
@@ -29,7 +27,7 @@ struct Rect
     int w = 0;
     int h = 0;
 
-};
+};  //test struct
 
 std::vector<Rect> stripeLoadList;
 qmap::stripe_map<Rect*> stripeMap(mapWidth, 1000);
